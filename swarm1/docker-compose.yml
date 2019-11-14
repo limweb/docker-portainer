@@ -1,0 +1,41 @@
+version: '3.5'
+networks:
+  kafka_network:
+  bridge:
+    external: true
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    environment:
+      TZ: "Asia/Bangkok"
+    networks:
+      - kafka_network
+    ports:
+      - "2181:2181"
+  kafka:
+    image: wurstmeister/kafka
+    environment:
+      TZ: "Asia/Bangkok"
+    networks:
+      - kafka_network
+    environment:
+      HOSTNAME_COMMAND: "hostname"
+      BROKER_ID_COMMAND: "date +%s|cut -c8-10"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:9094
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_CREATE_TOPICS: "syslog:1:1"
+  producer:
+    image: krmonline/syslog-ng-softnix:0.9dev
+    environment:
+      TZ: "Asia/Bangkok"
+    networks:
+      - kafka_network
+  consumer:
+    image: krmonline/syslog-ng-softnix:0.9dev
+    environment:
+      TZ: "Asia/Bangkok"
+    networks:
+      - kafka_network

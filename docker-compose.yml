@@ -19,7 +19,7 @@ services:
       - swarm_network
 volumes:
   portainer_data:
-    name: my_redis_data
+    name: portainer_data
     driver: local
 
 networks:
