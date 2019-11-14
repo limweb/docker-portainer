@@ -19,6 +19,8 @@ services:
       - swarm_network
 volumes:
   portainer_data:
+    name: my_redis_data
+    driver: local
 
 networks:
   default:
@@ -33,3 +35,5 @@ networks:
       name: backend-network
   swarm_network:
     driver: overlay
+    external:
+      name: swarm_network
