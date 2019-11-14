@@ -21,7 +21,7 @@ volumes:
   portainer_data:
 
 networks:
-  rproxy:
+  reverse_proxy:
     external:
       name: reverse_proxy
   agent_network_dtics:
