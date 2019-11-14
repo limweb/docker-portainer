@@ -1,0 +1,48 @@
+version: "3.2"
+
+services:
+    agent_dtics:
+        image: portainer/agent
+        environment:
+          # REQUIRED: Should be equal to the service name prefixed by "tasks." when
+          # deployed inside an overlay network
+          AGENT_CLUSTER_ADDR: tasks.portainer_agent_dtics
+          # AGENT_PORT: 9001
+          # LOG_LEVEL: debug
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        deploy:
+            mode: global
+        networks:
+          - agent_network_dtics
+    server:
+        image: portainer/portainer:latest
+        volumes:
+            - data_volume:/data
+        deploy:
+            mode: replicated
+            replicas: 1
+            placement:
+               constraints:
+                - node.labels.interconnect == si
+            restart_policy:
+                condition: on-failure
+                max_attempts: 3
+                window: 120s
+        environment:
+          SERVICE_PORTS: "9000"
+        networks:
+          - rproxy
+          - agent_network_dtics
+        dns:
+          - 10.1.1.243
+          - 10.1.1.239
+ volumes:
+   portainer_data:
+
+networks:
+  rproxy:
+    external:
+      name: reverse_proxy
+  agent_network_dtics:
+    driver: overlay
