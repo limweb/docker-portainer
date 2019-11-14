@@ -1,5 +1,5 @@
 #  docker-compose -f docker-compose.yml config check validate config
-version: "3.2"
+version: "3.7"
 services:
   portainer:
     image: "portainer/portainer:latest"
@@ -11,19 +11,25 @@ services:
       - "9000"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - portainer_data:/data
+      - "portainer_data:/data"
     labels:
       com.docker.compose.project: "portainer"
     networks:
       - reverse_proxy
-      - agent_network_dtics
-
+      - swarm_network
 volumes:
   portainer_data:
 
 networks:
+  default:
+    driver: bridge
+    external:
+      name: frontend-network
   reverse_proxy:
     external:
       name: reverse_proxy
-  agent_network_dtics:
+  network-backend:
+    external:
+      name: backend-network
+  swarm_network:
     driver: overlay
