@@ -17,6 +17,30 @@ services:
     networks:
       - reverse_proxy
       - swarm_network
+
+  swarmpit:
+    image: swarmpit/swarmpit:1.8
+    environment:
+      - SWARMPIT_DB=http://db:5984
+      - SWARMPIT_INFLUXDB=http://influxdb:8086
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 888:8080
+    networks:
+      - swarm_network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 1024M
+        reservations:
+          cpus: "0.25"
+          memory: 512M
+      placement:
+        constraints:
+          - node.role == manager
+
 volumes:
   portainer_data:
     name: portainer_data
